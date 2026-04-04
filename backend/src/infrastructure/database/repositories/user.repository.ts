@@ -1,9 +1,8 @@
 import User from "../model/user.model";
 import { IUserReadRepository, IUserWriteRepository, IFriendShipRepository } from "../../../application/ports/repositories/user.port";
 import { UserEntity } from "../../../domain/user/entity";
-import { UserMapper } from "../mappers/user.mapper";
+import { UserMapper } from "../../../presentation/mappers/user.mapper";
 import type { IOutputUserDTO } from "../../../application/use-cases/user/get-users.use-case";
-
 
 export class UserReadRepository implements IUserReadRepository {
 

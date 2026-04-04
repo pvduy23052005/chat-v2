@@ -5,17 +5,6 @@ export interface ILastMessage {
   readBy?: string[]
 }
 
-export interface IGetRoom {
-  _id: string;
-  title: string;
-  typeRoom: string;
-  avatar: string;
-  lastMessage: ILastMessage;
-  updatedAt: Date;
-  otherUserId?: string;
-  statusOnline: "online" | "offline";
-}
-
 export interface IRoom {
   id?: string;
   title: string;
@@ -24,7 +13,7 @@ export interface IRoom {
   status?: string;
   createdAt?: Date;
   updatedAt?: Date;
-  members: any[];
+  members: IRoomMember[];
   lastMessageId?: string;
 }
 

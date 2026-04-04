@@ -25,17 +25,17 @@ export class RoomEntity {
 
   public static createRoom(creatorId: string, memberIds: string[], typeRoom: "single" | "group", title?: string, avatar?: string) {
 
-    let members = [];
+    let members: IRoomMember[] = [];
 
     if (typeRoom === "group") {
       members = [
         { user_id: creatorId, role: "superAdmin", status: "accepted" },
-        ...memberIds.map(id => ({ user_id: id, role: "member", status: "accepted" }))
+        ...memberIds.map((id): IRoomMember => ({ user_id: id, role: "member", status: "accepted" }))
       ];
     } else {
       members = [
         { user_id: creatorId, role: "member", status: "accepted" },
-        { user_id: memberIds[0], role: "member", status: "waiting" }
+        { user_id: memberIds[0] || "", role: "member", status: "waiting" }
       ];
     }
 
@@ -48,7 +48,7 @@ export class RoomEntity {
   }
 
   public static createFriendRoom(userAId: string, userBId: string) {
-    const members = [
+    const members: IRoomMember[] = [
       { user_id: userAId, role: "member", status: "accepted" },
       { user_id: userBId, role: "member", status: "accepted" }
     ];
@@ -193,6 +193,7 @@ export class RoomEntity {
 
   public isOwner(userId: string): boolean {
     const owner = this.members.find(m => m.user_id.toString() === userId);
+    console.log(owner);
     return owner?.role === "superAdmin";
   }
 

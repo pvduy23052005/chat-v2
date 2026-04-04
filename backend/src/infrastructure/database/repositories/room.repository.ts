@@ -51,7 +51,7 @@ export class RoomReadRepository implements IRoomReadRepository {
 
     if (!rooms || rooms.length === 0) return [];
 
-    return rooms.map((room) => RoomQueryMapper.toDTO(room, userID));
+    return rooms.map((room) => RoomQueryMapper.toRoomDTO(room, userID));
   }
 
   async findRoomWithUser(roomID: string, userID: string) {
@@ -81,7 +81,7 @@ export class RoomReadRepository implements IRoomReadRepository {
     const room = await Room.findOne({
       _id: roomID,
       deleted: false
-    }).populate(ROOM_POPULATE_OPTIONS).lean();
+    }).lean();
 
     if (!room) return null;
 

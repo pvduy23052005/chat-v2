@@ -1,4 +1,4 @@
-import { UserEntity } from "../../../domain/user/entity";
+import { UserEntity } from "../../domain/user/entity";
 
 export class UserMapper {
   public static toDomain(raw: any): UserEntity | null {
@@ -16,9 +16,6 @@ export class UserMapper {
     });
   }
 
-  /**
-   * Chuyển đổi từ UserEntity sang plain object để lưu vào MongoDB
-   */
   public static toPersistence(user: UserEntity): any {
     return {
       fullName: user.getProfile().fullName,

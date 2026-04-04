@@ -2,7 +2,7 @@ import type { GetRoomOutputDTO } from "../../application/dtos/room/get-room.dto"
 import type { RoomDetailOutputDTO } from "../../application/dtos/room/get-detail-room.dto";
 
 export class RoomQueryMapper {
-  public static toDTO(rawRoom: any, currentUserID: string): GetRoomOutputDTO {
+  public static toRoomDTO(rawRoom: any, currentUserID: string): GetRoomOutputDTO {
     let title = rawRoom.title;
     let avatar = rawRoom.avatar || "/images/default-avatar.webp";
     let otherUserId = "";

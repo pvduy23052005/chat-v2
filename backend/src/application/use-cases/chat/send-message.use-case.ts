@@ -1,7 +1,7 @@
 import { IChatWriteRepository } from "../../ports/repositories/chat.port";
 import { IRoomWriteRepository } from "../../ports/repositories/room.port";
 import { ChatEntity } from "../../../domain/chat/chat.entity";
-import { IChatDetail } from "../../../domain/chat/chat.type";
+import { ChatOutputDto } from "../../dtos/chat/get-chat-dto";
 export interface IDataChat {
   user_id: string;
   content: string;
@@ -16,7 +16,7 @@ export class SendMessageUseCase {
     private readonly roomRepo: IRoomWriteRepository,
   ) { }
 
-  async execute(dataChat: IDataChat): Promise<IChatDetail | null> {
+  async execute(dataChat: IDataChat): Promise<ChatOutputDto | null> {
     const { user_id, room_id, content, images } = dataChat;
 
     const newMessage = ChatEntity.create({

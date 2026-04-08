@@ -1,5 +1,5 @@
 import Room from "../model/room.model";
-import { IRoomReadRepository, IRoomWriteRepository, IRoomMemberRepository } from "../../../application/ports/repositories/room.port";
+import { IRoomReadRepository, IRoomWriteRepository } from "../../../application/ports/repositories/room.port";
 import { GetRoomOutputDTO } from "../../../application/dtos/room/get-room.dto";
 import { RoomQueryMapper } from "../../../presentation/mappers/room.mapper";
 import { RoomEntity } from "../../../domain/room/entity";
@@ -82,7 +82,6 @@ export class RoomReadRepository implements IRoomReadRepository {
       _id: roomID,
       deleted: false
     }).lean();
-
     if (!room) return null;
 
     return mapToEntity(room);
@@ -138,37 +137,6 @@ export class RoomWriteRepository implements IRoomWriteRepository {
         lastMessageId: messageID,
         updatedAt: new Date()
       }
-    );
-  }
-}
-
-export class RoomMemberRepository implements IRoomMemberRepository {
-
-  async addMembersToRoom(roomID: string, newMembers: { user_id: string, role: string, status: string }[]) {
-    await Room.updateOne(
-      { _id: roomID },
-      { $push: { members: { $each: newMembers } } }
-    );
-  }
-
-  async removeMemberFromRoom(roomID: string, memberID: string) {
-    await Room.updateOne(
-      { _id: roomID },
-      { $pull: { members: { user_id: memberID } } }
-    );
-  }
-
-  async assignAdminRole(roomID: string, memberID: string) {
-    await Room.updateOne(
-      { _id: roomID, "members.user_id": memberID },
-      { $set: { "members.$.role": "superAdmin" } }
-    );
-  }
-
-  async updateMemberStatus(roomID: string, status: string): Promise<void> {
-    await Room.updateOne(
-      { _id: roomID },
-      { $set: { "members.$[].status": status } }
     );
   }
 }

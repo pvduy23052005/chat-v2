@@ -11,11 +11,12 @@ export class CreateNewRoomUseCase {
     private readonly roomWriteRepo: IRoomWriteRepository
   ) { }
 
-  async execute(myID: string, titleRoom: string, members: string[]): Promise<CreateRoomOutputDTO> {
+  async execute(myId: string, titleRoom: string, members: string[]): Promise<CreateRoomOutputDTO> {
 
     if (!titleRoom) {
       throw new Error("Nhập tên phòng");
     }
+
     if (!members) {
       throw new Error("Vui lòng chọn thành viên");
     }
@@ -28,7 +29,7 @@ export class CreateNewRoomUseCase {
       throw new Error("Vui lòng chọn trên 2 người!");
     }
 
-    const room = RoomEntity.createRoom(myID, memberIDs, "group", titleRoom);
+    const room = RoomEntity.createGroupRoom(myId, memberIDs, titleRoom);
 
     const newRoom = await this.roomWriteRepo.createNewRoom(room);
 

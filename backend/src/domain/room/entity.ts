@@ -1,4 +1,5 @@
 import { IRoomMember, IRoom } from "./type";
+import { RoomMemberVO } from "./value-object/roomMember";
 
 export class RoomEntity {
   private id: string;
@@ -8,7 +9,7 @@ export class RoomEntity {
   private status: string;
   private createdAt: Date;
   private updatedAt: Date;
-  private members: IRoomMember[];
+  private members: RoomMemberVO[];
   private lastMessageId: string;
 
   private constructor(data: IRoom) {
@@ -19,31 +20,41 @@ export class RoomEntity {
     this.status = data.status || "active";
     this.createdAt = data.createdAt || new Date();
     this.updatedAt = data.updatedAt || new Date();
-    this.members = data.members || [];
+    this.members = data.members;
     this.lastMessageId = data.lastMessageId || "";
   }
 
-  public static createRoom(creatorId: string, memberIds: string[], typeRoom: "single" | "group", title?: string, avatar?: string) {
+  public static createGroupRoom(creatorId: string, memberIds: string[], title?: string, avatar?: string) {
+    if (!title || title.trim() === "") throw new Error("Phòng nhóm bắt buộc phải có tên");
 
-    let members: IRoomMember[] = [];
-
-    if (typeRoom === "group") {
-      members = [
-        { user_id: creatorId, role: "superAdmin", status: "accepted" },
-        ...memberIds.map((id): IRoomMember => ({ user_id: id, role: "member", status: "accepted" }))
-      ];
-    } else {
-      members = [
-        { user_id: creatorId, role: "member", status: "accepted" },
-        { user_id: memberIds[0] || "", role: "member", status: "waiting" }
-      ];
-    }
+    const members: RoomMemberVO[] = [
+      RoomMemberVO.createSuperAdmin(creatorId),
+      ...memberIds.map(id => RoomMemberVO.createMember(id))
+    ]
 
     return new RoomEntity({
       title: title || "",
-      typeRoom: typeRoom,
+      typeRoom: "group",
       members,
       avatar: avatar || "/images/default-avatar.webp"
+    });
+  }
+
+  public static createSingleRoom(creatorId: string, memberId: string) {
+    if (!memberId || memberId.trim() === "") {
+      throw new Error("Phòng chat 1-1 bắt buộc phải có người được mời");
+    }
+
+    const members: RoomMemberVO[] = [
+      RoomMemberVO.createMember(creatorId),
+      RoomMemberVO.createWaitingMember(memberId)
+    ]
+
+    return new RoomEntity({
+      title: "",
+      typeRoom: "single",
+      members,
+      avatar: "/images/default-avatar.webp"
     });
   }
 
@@ -68,63 +79,57 @@ export class RoomEntity {
     }));
   }
 
-  public addMember(userId: string, requesterId: string): void {
+  public addMember(newMemberId: string, requesterId: string): void {
     if (this.typeRoom === "single") {
       throw new Error("Không thể thêm thành viên vào phòng chat cá nhân");
     }
 
-    this.isAdmin(requesterId);
-    this.isSuperAdmin(requesterId);
+    this.ensureAdmin(requesterId);
 
-    const isExist = this.members.some(m => this.getMemberId(m.user_id) === userId);
+    const isExist = this.getMember(newMemberId);
     if (isExist) {
       throw new Error("Người dùng đã là thành viên của phòng");
     }
 
-    this.members.push({
-      user_id: userId,
-      role: "member",
-      status: "accepted"
-    });
+    const newMember = RoomMemberVO.createMember(newMemberId);
+    this.members.push(newMember);
     this.updatedAt = new Date();
   }
 
   public removeMember(removeMemberID: string, requesterID: string): void {
 
-    this.isAdmin(requesterID);
-    this.isSuperAdmin(requesterID);
+    this.ensureAdmin(requesterID);
 
     if (removeMemberID === requesterID) {
       throw new Error("Không thể xóa chính mình khỏi nhóm");
     }
 
-    const targetMember = this.members.find(m => this.getMemberId(m.user_id) === removeMemberID);
-    if (!targetMember) {
+    const isExist = this.getMember(removeMemberID);
+    if (!isExist) {
       throw new Error("Người dùng không phải là thành viên của phòng");
     }
 
-    const requester = this.members.find(m => this.getMemberId(m.user_id) === requesterID);
-    if (requester?.role === "admin" && targetMember.role !== "member") {
+    const requester = this.getMember(requesterID);
+    if (requester?.role === "admin" && isExist.role !== "member") {
       throw new Error("Quản trị viên chỉ có quyền xóa thành viên bình thường");
     }
 
-    this.members = this.members.filter(m => this.getMemberId(m.user_id) !== removeMemberID);
+    this.members = this.members.filter(m => m.user_id.toString() !== removeMemberID);
     this.updatedAt = new Date();
   }
 
   public leaveRoom(userId: string): void {
-    const memberIndex = this.members.findIndex(m => this.getMemberId(m.user_id) === userId);
+    const memberIndex = this.getMember(userId);
 
-    if (memberIndex === -1) {
+    if (!memberIndex) {
       throw new Error("Bạn không phải là thành viên của phòng này");
     }
 
-    const member = this.members.find(m => this.getMemberId(m.user_id) === userId);
-    if (member?.role === "superAdmin") {
+    if (memberIndex.role === "superAdmin") {
       throw new Error("Không thể rời khỏi phòng khi là trưởng nhóm");
     }
 
-    this.members.splice(memberIndex, 1);
+    this.members = this.members.filter(m => m.user_id.toString() !== userId);
     this.updatedAt = new Date();
   }
 
@@ -137,18 +142,23 @@ export class RoomEntity {
       throw new Error("Bạn không thể tự thao tác lên chính mình");
     }
 
-    this.isSuperAdmin(requesterId);
+    this.ensureSuperAdmin(requesterId);
 
-    const targetMember = this.members.find(m => this.getMemberId(m.user_id) === targetUserId);
-    if (!targetMember) {
+    const targetIndex = this.members.findIndex(m => m.user_id === targetUserId);
+    if (targetIndex === -1) {
       throw new Error("Người dùng này không có mặt trong phòng");
     }
 
-    if (targetMember.role === "admin" || targetMember.role === "superAdmin") {
+    const currentMember = this.members[targetIndex];
+    if (!currentMember) {
+      throw new Error("Không tìm thấy thành viên")
+    }
+
+    if (currentMember.role === "admin" || currentMember.role === "superAdmin") {
       throw new Error("Người dùng này đã là quản trị viên rồi");
     }
 
-    targetMember.role = "admin";
+    this.members[targetIndex] = RoomMemberVO.promoteAdmin(currentMember);
     this.updatedAt = new Date();
   }
 
@@ -167,25 +177,10 @@ export class RoomEntity {
       throw new Error("Không thể đổi tên phòng chat cá nhân");
     }
 
-    this.isAdmin(requesterId);
-    this.isSuperAdmin(requesterId);
+    this.ensureSuperAdmin(requesterId);
 
     this.title = trimmedTitle;
     this.updatedAt = new Date();
-  }
-
-  public isAdmin(user_id: string): void {
-    const member = this.members.find(m => m.user_id.toString() === user_id);
-    if (member?.role !== "admin") {
-      throw new Error("Bạn không có quyền admin");
-    }
-  }
-
-  public isSuperAdmin(user_id: string): void {
-    const member = this.members.find(m => m.user_id.toString() === user_id);
-    if (member?.role !== "superAdmin") {
-      throw new Error("Bạn không có quyền super admin");
-    }
   }
 
   public checkIsMember(userId: string): void {
@@ -198,7 +193,6 @@ export class RoomEntity {
 
   public isOwner(userId: string): boolean {
     const owner = this.members.find(m => m.user_id.toString() === userId);
-    console.log(owner);
     return owner?.role === "superAdmin";
   }
 
@@ -206,11 +200,26 @@ export class RoomEntity {
     return new RoomEntity(data);
   }
 
-  private getMemberId(user_id: any): string {
-    if (typeof user_id === "object" && user_id !== null) {
-      return (user_id._id || user_id.id || "").toString();
+  private getMember(userId: string): RoomMemberVO | undefined {
+    return this.members.find(m => m.user_id.toString() === userId.toString());
+  }
+
+  private ensureAdmin(requesterId: string): void {
+    const requester = this.getMember(requesterId);
+    if (!requester) {
+      throw new Error("Người thao tác không nằm trong phòng chat này");
     }
-    return (user_id || "").toString();
+
+    if (requester.role !== "admin" && requester.role !== "superAdmin") {
+      throw new Error("Chỉ Admin hoặc Super Admin mới có quyền thực hiện thao tác này");
+    }
+  }
+
+  private ensureSuperAdmin(requesterId: string): void {
+    const requester = this.getMember(requesterId);
+    if (!requester || requester.role !== "superAdmin") {
+      throw new Error("Chỉ duy nhất Super Admin (Chủ phòng) mới có quyền này");
+    }
   }
 
   public toObject() {
@@ -220,10 +229,13 @@ export class RoomEntity {
       typeRoom: this.typeRoom,
       avatar: this.avatar,
       status: this.status,
-      members: this.members,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      lastMessageId: this.lastMessageId
+      members: this.members.map(member => ({
+        user_id: member.user_id,
+        role: member.role,
+        status: member.status
+      }))
     };
   }
 

@@ -13,7 +13,7 @@ export class SendMessageUseCase {
 
   constructor(
     private readonly chatWriteRepo: IChatWriteRepository,
-    private readonly roomRepo: IRoomWriteRepository,
+    private readonly roomRepo: IRoomWriteRepository ,
   ) { }
 
   async execute(dataChat: IDataChat): Promise<ChatOutputDto | null> {

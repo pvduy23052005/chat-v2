@@ -39,7 +39,7 @@ function Create() {
     e.preventDefault();
 
     if (!titleRoom.trim()) {
-      toast.success("Vui long nhap tieu de ");
+      toast.error("Vui lòng nhập tiêu đề");
       return;
     }
     if (selectedMembers.length === 0) {

@@ -13,8 +13,8 @@ export class ChatNotFriendUseCase {
     if (existRoom) {
       return existRoom.getId();
     } else {
-      const newRoomEntity = RoomEntity.createRoom(myID, [userID], "single");
-      
+      const newRoomEntity = RoomEntity.createSingleRoom(myID, userID);
+
       const newRoom = await this.roomWriteRepo.createNewRoom(newRoomEntity);
       return newRoom.getId();
     }

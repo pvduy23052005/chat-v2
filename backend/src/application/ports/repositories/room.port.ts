@@ -17,10 +17,3 @@ export interface IRoomWriteRepository {
   softDeleteRoom(roomID: string): Promise<void>;
   updateLastMessage(roomID: string, messageID: any): Promise<void>;
 }
-
-export interface IRoomMemberRepository {
-  addMembersToRoom(roomID: string, newMembers: { user_id: string, role: string, status: string }[]): Promise<void>;
-  removeMemberFromRoom(roomID: string, memberID: string): Promise<void>;
-  assignAdminRole(roomID: string, memberID: string): Promise<void>;
-  updateMemberStatus(roomID: string, status: string): Promise<void>;
-}

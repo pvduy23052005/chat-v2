@@ -1,10 +1,17 @@
-export interface ChatSenderOutputDto {
+export interface MessageInputDto {
+  user_id: string;
+  content: string;
+  room_id: string;
+  images: string[];
+}
+
+export interface MessageSenderOutputDto {
   id: string;
   fullName?: string;
   avatar?: string;
 }
 
-export interface ChatOutputDto {
+export interface MessageOutputDto {
   id: string | undefined;
   user_id?: string | undefined;
   room_id: string;
@@ -16,5 +23,5 @@ export interface ChatOutputDto {
   deleted: boolean;
   createdAt: Date | undefined;
   updatedAt: Date | undefined;
-  sender?: ChatSenderOutputDto;
+  sender?: MessageSenderOutputDto;
 }

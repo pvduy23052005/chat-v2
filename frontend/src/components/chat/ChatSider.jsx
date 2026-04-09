@@ -102,7 +102,7 @@ function ChatSider() {
             const messageContent = lastMsg.content || "Bắt đầu cuộc trò chuyện";
 
             const isOnline = onlineUserIDs.includes(room.otherUserId);
-            const isActive = currentRoomID === room._id;
+            const isActive = currentRoomID === room.id;
 
             return (
               <Link

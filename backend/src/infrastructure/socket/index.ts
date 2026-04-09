@@ -23,19 +23,8 @@ export const socketInit = (httpServer: http.Server) => {
 
   io.on("connection", async (socket: Socket) => {
     const myID = socket.data.user.userId;
-    if (myID) {
-      const rooms = await Room.find({
-        "members.user_id": myID,
-        deleted: false
-      }).select("_id").lean();
 
-      if (rooms.length > 0) {
-        rooms.forEach((room: any) => {
-          const roomId = room._id.toString();
-          socket.join(roomId);
-        });
-      }
-    }
+    socket.join(myID);
 
     chatSocket(io, socket);
     userSocket(io, socket);

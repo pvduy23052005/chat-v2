@@ -1,6 +1,6 @@
 import { IChatReadRepository } from "../../ports/repositories/chat.port";
 import { IRoomReadRepository } from "../../ports/repositories/room.port";
-import { ChatOutputDto } from "../../dtos/chat/get-chat-dto";
+import { MessageOutputDto } from "../../dtos/chat/get-chat-dto";
 
 export class GetChatHistoryUseCase {
 
@@ -9,7 +9,7 @@ export class GetChatHistoryUseCase {
     private readonly roomRepository: IRoomReadRepository
   ) { }
 
-  public async execute(userId: string, roomID: string, cursor?: string, limit: number = 15): Promise<ChatOutputDto[]> {
+  public async execute(userId: string, roomID: string, cursor?: string, limit: number = 15): Promise<MessageOutputDto[]> {
 
     const room = await this.roomRepository.findRoomById(roomID);
 

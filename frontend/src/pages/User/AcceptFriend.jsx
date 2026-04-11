@@ -12,8 +12,8 @@ function AcceptFriend() {
     const handleGetUser = async () => {
       try {
         setLoading(true);
-        const res = await userServiceAPI.getUserAccepts();
-        setUsers(res.friendAccepts || []);
+        const res = await userServiceAPI.getFriendRequest();
+        setUsers(res.friendRequests || []);
       } catch (error) {
         console.error("Lỗi lấy danh sách lời mời:", error);
       } finally {

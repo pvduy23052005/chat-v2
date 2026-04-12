@@ -1,13 +1,10 @@
 import http from 'http';
-import { Server } from 'socket.io';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 import { authSocketMiddleware } from '../../presentation/socket/middleware/auth.middleware';
 import { chatSocket } from '../../presentation/socket/handler/chat.handler';
 import { roomSocket } from '../../presentation/socket/handler/room.handler';
 import { userSocket } from '../../presentation/socket/handler/user.handler';
-
-import Room from "../database/model/room.model";
 
 export const socketInit = (httpServer: http.Server) => {
   const io = new Server(httpServer, {
@@ -29,6 +26,5 @@ export const socketInit = (httpServer: http.Server) => {
     chatSocket(io, socket);
     userSocket(io, socket);
     roomSocket(io, socket);
-  })
-
+  });
 };

@@ -9,6 +9,7 @@ import { UserWriteRepository } from "../../../infrastructure/database/repositori
 
 import { BcryptHashService } from "../../../infrastructure/external-service/bcrypt-hash.service";
 import { TokenService } from "../../../infrastructure/external-service/token.service";
+import { catchAsync } from "../../utils/catchAsyn";
 
 const userReadRepository = new UserReadRepository();
 const userWriteRepository = new UserWriteRepository();
@@ -16,42 +17,33 @@ const bcryptService = new BcryptHashService();
 const tokenService = new TokenService();
 
 // [post] auth/login . 
-export const login = async (req: Request, res: Response) => {
-  try {
-    const email = req.body.email;
-    const password = req.body.password;
+export const login = catchAsync(async (req: Request, res: Response) => {
+  const email = req.body.email;
+  const password = req.body.password;
 
-    const loginUseCase = new LoginUseCase(userReadRepository, userWriteRepository, bcryptService, tokenService);
-    const { user, token } = await loginUseCase.execute(email, password);
+  const loginUseCase = new LoginUseCase(userReadRepository, userWriteRepository, bcryptService, tokenService);
+  const { user, token } = await loginUseCase.execute(email, password);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "none",
-      path: "/",
-      secure: true,
-      maxAge: 24 * 60 * 60 * 1000
-    });
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "none",
+    path: "/",
+    secure: true,
+    maxAge: 24 * 60 * 60 * 1000
+  });
 
-    // socket .
-    _io.emit("SERVER_RETURN_ROOM_STATUS", {
-      userID: user.id,
-      status: "online"
-    });
+  // socket .
+  _io.emit("SERVER_RETURN_ROOM_STATUS", {
+    userID: user.id,
+    status: "online"
+  });
 
-    res.status(200).json({
-      success: true,
-      user: user,
-      token: token
-    })
-
-  } catch (error: any) {
-    console.log("error loginpost:", error);
-    res.status(400).json({
-      success: false,
-      message: error.message || "Lỗi hệ thống, vui lòng thử lại sau"
-    });
-  }
-}
+  res.status(200).json({
+    success: true,
+    user: user,
+    token: token
+  });
+});
 
 // [post] auth/logout . 
 export const logout = async (req: Request, res: Response) => {
@@ -84,30 +76,21 @@ export const logout = async (req: Request, res: Response) => {
 }
 
 // [post] auth/register . 
-export const register = async (req: Request, res: Response) => {
-  try {
+export const register = catchAsync(async (req: Request, res: Response) => {
+  let { email, password, fullName, passwordConfirm } = req.body;
 
-    let { email, password, fullName, passwordConfirm } = req.body;
+  const dataUser = {
+    fullName: fullName.trim(),
+    email: email.trim(),
+    password: password.trim(),
+    passwordConfirm: passwordConfirm.trim(),
+  };
 
-    const dataUser = {
-      fullName: fullName.trim(),
-      email: email.trim(),
-      password: password.trim(),
-      passwordConfirm: passwordConfirm.trim(),
-    };
+  const registerUserUseCase = new RegisterUserUseCase(userReadRepository, userWriteRepository, bcryptService);
+  const newUser = await registerUserUseCase.execute(dataUser);
 
-    const registerUserUseCase = new RegisterUserUseCase(userReadRepository, userWriteRepository, bcryptService);
-    const newUser = await registerUserUseCase.execute(dataUser);
-
-    res.status(201).json({
-      success: true,
-      dataUser: newUser
-    });
-
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message || "Lỗi hệ thống"
-    });
-  }
-}
+  res.status(201).json({
+    success: true,
+    dataUser: newUser
+  });
+});

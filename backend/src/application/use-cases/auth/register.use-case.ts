@@ -1,6 +1,8 @@
 import { IPasswordService } from "../../ports/services/password.port";
 import { IUserWriteRepository, IUserReadRepository } from "../../ports/repositories/user.port";
 import { UserEntity } from "../../../domain/user/entity";
+import { EmailAlreadyExistsError, PasswordMismatchError } from "../../../domain/user/user.errors";
+
 export class RegisterUserUseCase {
   constructor(
     private readonly userReadRepo: IUserReadRepository,
@@ -11,17 +13,13 @@ export class RegisterUserUseCase {
   public async execute(dataUser: any) {
     const { fullName, email, password, passwordConfirm } = dataUser;
 
-    if (!email || !fullName || !password || !passwordConfirm) {
-      throw new Error("Vui lòng điền đầy đủ thông tin");
-    }
-
     if (password !== passwordConfirm) {
-      throw new Error("Xác nhận mật khẩu không đúng");
+      throw new PasswordMismatchError();
     }
 
     const user = await this.userReadRepo.findUserByEmail(email);
     if (user) {
-      throw new Error("Email đã tồn tại");
+      throw new EmailAlreadyExistsError();
     }
 
     const hashedPassword = await this.passwordService.hashPassword(password);

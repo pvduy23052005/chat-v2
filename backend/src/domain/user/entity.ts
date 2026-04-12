@@ -1,3 +1,4 @@
+import { DomainValidationError } from "../shared/errors/domain.errors";
 import { IUserProps, IUserProfile, IUserRestore, IUpdateProfile } from "./type";
 
 export class UserEntity {
@@ -72,6 +73,24 @@ export class UserEntity {
 
 
   public static create(data: IUserProps): UserEntity {
+    const errors: Record<string, string> = {};
+
+    if (!data.email || !data.email.includes('@')) {
+      errors.email = "Email không hợp lệ hoặc bị để trống";
+    }
+
+    if (!data.fullName || data.fullName.trim().length === 0) {
+      errors.fullName = "Họ tên không được để trống";
+    }
+
+    if (!data.password || data.password.length <= 6) {
+      errors.password = 'Mat khau toi thieu 6 ky tu';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new DomainValidationError(errors);
+    }
+
     return new UserEntity({
       fullName: data.fullName,
       email: data.email,

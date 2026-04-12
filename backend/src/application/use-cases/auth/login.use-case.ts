@@ -1,8 +1,8 @@
 import { IUserReadRepository, IUserWriteRepository } from "../../ports/repositories/user.port";
 import { IPasswordService } from "../../ports/services/password.port";
 import { ITokenService } from "../../ports/services/token.port";
-
 import { IUserProfile } from "../../../domain/user/type";
+import { InvalidCredentialsError, MissingCredentialsError } from "../../../domain/user/user.errors";
 
 export interface LoginResponse {
   user: IUserProfile;
@@ -17,21 +17,15 @@ export class LoginUseCase {
     private readonly tokenService: ITokenService,
   ) { }
 
-  public async execute(email?: string, password?: string): Promise<LoginResponse> {
+  public async execute(email: string, password: string): Promise<LoginResponse> {
     if (!email || !password) {
-      throw new Error("Vui lòng điền đầy đủ thông tin");
+      throw new MissingCredentialsError();
     }
 
     const user = await this.userReadRepo.findUserByEmail(email);
 
-    if (!user) {
-      throw new Error("Email không chính xác");
-    }
-
-    const isPasswordMatch: boolean = await this.passwordService.comparePassword(password, user.getPassword());
-
-    if (!isPasswordMatch) {
-      throw new Error("Mật khẩu không đúng");
+    if (!user || !(await this.passwordService.comparePassword(password, user.getPassword()))) {
+      throw new InvalidCredentialsError();
     }
 
     user.setStatusOnline("online");

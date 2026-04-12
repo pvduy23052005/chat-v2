@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   frontend:
-    container_name: chat-frontend
-    image: chat-frontend-app
+    container_name: chat-app-frontend
+    image: chat-app-frontend
 
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=https://chatapp-1-8ca1.onrender.com/
+        - VITE_API_URL=${VITE_API_URL}
     ports:
       - "5173:80"
     restart: always

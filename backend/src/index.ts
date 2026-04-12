@@ -5,6 +5,8 @@ import allRoute from "./presentation/http/routes/index.route";
 import { connectDatabase } from "./infrastructure/config/database";
 import cookieParser from "cookie-parser"
 import cors from "cors";
+import { errorHandle } from "./presentation/http/middlewares/error.middleware";
+
 import http from "http";
 import { socketInit } from "./infrastructure/socket";
 
@@ -28,6 +30,8 @@ app.use(cors(corsOptions));
 connectDatabase();
 allRoute(app);
 socketInit(server);
+
+app.use(errorHandle);
 
 server.listen(port, () => {
   console.log(`Server is running ${port}`);

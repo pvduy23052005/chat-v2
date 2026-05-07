@@ -46,34 +46,26 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 });
 
 // [post] auth/logout . 
-export const logout = async (req: Request, res: Response) => {
-  try {
-    const { myID } = req.body;
+export const logout = catchAsync(async (req: Request, res: Response) => {
+  const { myID } = req.body;
 
-    res.clearCookie("token");
+  res.clearCookie("token");
 
-    const logoutUseCase = new LogoutUseCase(userReadRepository, userWriteRepository);
+  const logoutUseCase = new LogoutUseCase(userReadRepository, userWriteRepository);
 
-    await logoutUseCase.execute(myID);
+  await logoutUseCase.execute(myID);
 
-    // socket .
-    _io.emit("SERVER_RETURN_ROOM_STATUS", {
-      userID: myID,
-      status: "offline"
-    });
+  // socket .
+  _io.emit("SERVER_RETURN_ROOM_STATUS", {
+    userID: myID,
+    status: "offline"
+  });
 
-    res.status(200).json({
-      success: true,
-      message: "Đăng xuất thành công!"
-    });
-
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message || "Lỗi hệ thống "
-    });
-  }
-}
+  res.status(200).json({
+    success: true,
+    message: "Đăng xuất thành công!"
+  });
+});
 
 // [post] auth/register . 
 export const register = catchAsync(async (req: Request, res: Response) => {

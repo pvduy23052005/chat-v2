@@ -20,7 +20,6 @@ const roomWriteRepo = new RoomWriteRepository();
 export const userSocket = (io: Server, socket: Socket) => {
   const myID: string = socket.data.user.userId;
 
-  // chatNotFriend
   socket.on("CLIENT_SEND_CHAT", async (data) => {
     const userID = data.userID;
     try {
@@ -34,7 +33,6 @@ export const userSocket = (io: Server, socket: Socket) => {
     }
   });
 
-  // friend request
   socket.on("CIENT_FRIEND_REQUEST", async (data) => {
     try {
       const friendRequestUseCase = new FriendRequestUseCase( friendRequestRepo);
@@ -44,7 +42,6 @@ export const userSocket = (io: Server, socket: Socket) => {
     }
   });
 
-  // friend cancel
   socket.on("CLIENT_FRIEND_CANCEL", async (data) => {
     try {
 
@@ -56,7 +53,6 @@ export const userSocket = (io: Server, socket: Socket) => {
     }
   });
 
-  // refuse friend
   socket.on("CLIENT_REFUSE_FRIEND", async (data) => {
     try {
       const refuseFriendUseCase = new RefuseFriendUseCase(friendRequestRepo);
@@ -66,7 +62,6 @@ export const userSocket = (io: Server, socket: Socket) => {
     }
   });
 
-  // accept friend
   socket.on("CLIENT_ACCEPT_FRIEND", async (data) => {
     try {
       const acceptFriendUseCase = new AcceptFriendUseCase(roomReadRepo, roomWriteRepo, friendRepo, friendRequestRepo);

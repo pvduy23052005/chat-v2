@@ -16,7 +16,6 @@ const userReadRepo = new UserReadRepository();
 export const roomSocket = async (io: Server, socket: Socket) => {
   const myID = socket.data.user.userId;
 
-  // notify remove member 
   socket.on("CLINET_REMOVE_MEMBER", async (data) => {
     try {
       const { roomID, fullName } = data;
@@ -31,7 +30,6 @@ export const roomSocket = async (io: Server, socket: Socket) => {
     }
   });
 
-  // notify add member 
   socket.on("CLINET_ADD_MEMBER", async (data) => {
     try {
       const { roomID, listFullNames } = data;
@@ -46,7 +44,6 @@ export const roomSocket = async (io: Server, socket: Socket) => {
     }
   });
 
-  // notify leave room . 
   socket.on("CLINET_MEMBER_LEAVE_ROOM", async (data) => {
     try {
       const { roomID, fullName } = data;
@@ -61,7 +58,6 @@ export const roomSocket = async (io: Server, socket: Socket) => {
     }
   });
 
-  // notify assign admin 
   socket.on("CLIENT_ASSIGN_ADMIN", async (data) => {
     try {
       const { roomID, fullName } = data;

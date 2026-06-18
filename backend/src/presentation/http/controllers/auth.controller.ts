@@ -32,7 +32,6 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     maxAge: 24 * 60 * 60 * 1000
   });
 
-  // socket .
   _io.emit("SERVER_RETURN_ROOM_STATUS", {
     userID: user.id,
     status: "online"
@@ -55,7 +54,6 @@ export const logout = catchAsync(async (req: Request, res: Response) => {
 
   await logoutUseCase.execute(myID);
 
-  // socket .
   _io.emit("SERVER_RETURN_ROOM_STATUS", {
     userID: myID,
     status: "offline"

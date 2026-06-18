@@ -19,7 +19,7 @@ export const uploadFile = async (files: any): Promise<string[]> => {
 
         const stream = cloudinary.uploader.upload_stream(
           {
-            folder: "products", // Đổi folder tùy ý
+            folder: "products",
             resource_type: resourceType,
             filename_override: cleanFileName,
             use_filename: true,

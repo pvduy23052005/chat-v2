@@ -27,8 +27,10 @@ export const markRoomRead_util = (rooms, currentRoomID, myID) => {
 };
 
 // handle last-message real-time .
-export const updateLastMessageAndReorder_util = (rooms, newMessage, myID) => {
-  const roomIndex = rooms.findIndex((room) => (room.id || room._id) === newMessage.room_id);
+export const updateLastMessageAndReorder_util = (rooms, newMessage) => {
+  const roomIndex = rooms.findIndex(
+    (room) => (room.id || room._id) === newMessage.room_id,
+  );
 
   if (roomIndex === -1) return rooms;
 
@@ -39,7 +41,8 @@ export const updateLastMessageAndReorder_util = (rooms, newMessage, myID) => {
   roomToUpdate.lastMessage = {
     content: newMessage.content,
     createdAt: newMessage.createdAt,
-    user_id: newMessage.user_id || newMessage.sender?.id || newMessage.sender?._id,
+    user_id:
+      newMessage.user_id || newMessage.sender?.id || newMessage.sender?._id,
     readBy: newMessage.readBy,
   };
 

@@ -1,14 +1,10 @@
 import {
-  IoInformationCircleOutline,
   IoEllipsisVertical,
 } from "react-icons/io5";
 import "../../styles/pages/chat/chatHeader.css";
-import { useAuth } from "../../hook/auth/useAuth";
 import { Link } from "react-router-dom";
 
 function ChatHeader({ currentRoomInfo }) {
-  const { user } = useAuth();
-
   if (!currentRoomInfo) {
     return (
       <div className="chat-header loading">

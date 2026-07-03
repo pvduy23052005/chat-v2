@@ -4,7 +4,6 @@ import { FaDeleteLeft, FaCrown } from "react-icons/fa6";
 import { useRoomAction } from "../../hook/room/useRoomAction";
 import { useRoomDetail } from "../../hook/room/useRoomDetail";
 import RoomHeader from "../../components/room/RoomHeader";
-import { updateAdminForRoom_util } from "../../utils/room.util";
 
 function Detail() {
   const { id } = useParams();

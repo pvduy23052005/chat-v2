@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { userServiceAPI } from "../../services/userServiceAPI";
 import { roomServiceAPI } from "../../services/roomServiceAPI";
 import "../../styles/pages/room/create.css";
 import { toast } from "react-toastify";

@@ -15,11 +15,3 @@ export interface IUserWriteRepository {
   createUser(user: UserEntity): Promise<UserEntity | null>;
   updateProfile(user: UserEntity): Promise<UserEntity | null>;
 }
-
-export interface IFriendShipRepository {
-  addFriendRequest(myID: string, friendID: string): Promise<void>;
-  addFriendAccept(myID: string, friendID: string): Promise<void>;
-  removeFriendRequest(myID: string, friendID: string): Promise<void>;
-  removeFriendAccept(myID: string, friendID: string): Promise<void>;
-  addFriendToList(myID: string, friendID: string, roomChatId: string): Promise<void>;
-}

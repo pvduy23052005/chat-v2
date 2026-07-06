@@ -73,10 +73,7 @@ export class RoomEntity {
   }
 
   public acceptAllMembers(): void {
-    this.members = this.members.map(member => ({
-      ...member,
-      status: "accepted"
-    }));
+    this.members = this.members.map(member => RoomMemberVO.accept(member));
   }
 
   public addMember(newMemberId: string, requesterId: string): void {

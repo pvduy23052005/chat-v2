@@ -53,4 +53,12 @@ export class RoomMemberVO {
       status: member.status
     });
   }
+
+  public static accept(member: RoomMemberVO): RoomMemberVO {
+    return new RoomMemberVO({
+      user_id: member.user_id,
+      role: member.role,
+      status: "accepted"
+    });
+  }
 }

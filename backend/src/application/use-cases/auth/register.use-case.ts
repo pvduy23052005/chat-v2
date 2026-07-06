@@ -1,7 +1,7 @@
 import { IPasswordService } from "../../ports/services/password.port";
 import { IUserWriteRepository, IUserReadRepository } from "../../ports/repositories/user.port";
 import { UserEntity } from "../../../domain/user/entity";
-import { EmailAlreadyExistsError, PasswordMismatchError } from "../../../domain/user/user.errors";
+import { EmailAlreadyExistsError, PasswordMismatchError, PasswordTooShortError } from "../../../domain/user/user.errors";
 
 export class RegisterUserUseCase {
   constructor(
@@ -15,6 +15,10 @@ export class RegisterUserUseCase {
 
     if (password !== passwordConfirm) {
       throw new PasswordMismatchError();
+    }
+
+    if (!password || password.length <= 6) {
+      throw new PasswordTooShortError();
     }
 
     const user = await this.userReadRepo.findUserByEmail(email);

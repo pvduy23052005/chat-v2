@@ -1,5 +1,5 @@
 import User from "../model/user.model";
-import { IUserReadRepository, IUserWriteRepository, IFriendShipRepository } from "../../../application/ports/repositories/user.port";
+import { IUserReadRepository, IUserWriteRepository } from "../../../application/ports/repositories/user.port";
 import { UserEntity } from "../../../domain/user/entity";
 import { UserMapper } from "../../../presentation/mappers/user.mapper";
 import type { IOutputUserDTO } from "../../../application/use-cases/user/get-users.use-case";
@@ -81,32 +81,3 @@ export class UserWriteRepository implements IUserWriteRepository {
   }
 }
 
-export class FriendShipRepository implements IFriendShipRepository {
-
-  public async addFriendRequest(myID: string, friendID: string): Promise<void> {
-    await User.updateOne({ _id: myID }, { $addToSet: { friendRequests: friendID } });
-  }
-
-  public async addFriendAccept(myID: string, friendID: string): Promise<void> {
-    await User.updateOne({ _id: myID }, { $addToSet: { friendAccepts: friendID } });
-  }
-
-  public async removeFriendRequest(myID: string, friendID: string): Promise<void> {
-    await User.updateOne({ _id: myID }, { $pull: { friendRequests: friendID } });
-  }
-
-  public async removeFriendAccept(myID: string, friendID: string): Promise<void> {
-    await User.updateOne({ _id: myID }, { $pull: { friendAccepts: friendID } });
-  }
-
-  public async addFriendToList(myID: string, friendID: string, roomChatId: string): Promise<void> {
-    await User.updateOne(
-      { _id: myID },
-      {
-        $addToSet: {
-          friendList: { user_id: friendID, room_chat_id: roomChatId },
-        }
-      }
-    );
-  }
-}

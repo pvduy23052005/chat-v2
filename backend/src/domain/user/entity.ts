@@ -83,8 +83,8 @@ export class UserEntity {
       errors.fullName = "Họ tên không được để trống";
     }
 
-    if (!data.password || data.password.length <= 6) {
-      errors.password = 'Mat khau toi thieu 6 ky tu';
+    if (!data.password || data.password.trim().length === 0) {
+      errors.password = 'Mật khẩu không được để trống';
     }
 
     if (Object.keys(errors).length > 0) {

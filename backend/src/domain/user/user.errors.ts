@@ -29,3 +29,9 @@ export class PasswordMismatchError extends DomainError {
     super(message);
   }
 }
+
+export class PasswordTooShortError extends DomainError {
+  constructor(message = "Mật khẩu tối thiểu 6 ký tự") {
+    super(message);
+  }
+}
